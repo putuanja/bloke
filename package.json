@@ -4,6 +4,7 @@
   "license": "MIT",
   "description": "Blog generator",
   "homepage": "https://github.com/DavidKk/bloke",
+  "author": "DavidJones",
   "repository": {
     "type": "git",
     "url": "https://github.com/DavidKk/bloke.git"
@@ -23,7 +24,6 @@
   "bin": {
     "bloke": "./bin/bloke"
   },
-  "author": "DavidJones",
   "devDependencies": {
     "babel-eslint": "^7.1.1",
     "babel-polyfill": "^6.23.0",

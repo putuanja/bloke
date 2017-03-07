@@ -2,13 +2,13 @@ import _                from 'lodash';
 import fs               from 'fs-extra';
 import path             from 'path';
 import async            from 'async';
-// import { md5 }          from './utils';
+import { md5 }          from './utils';
 import { includeTheme } from './converter';
 import * as VARS        from '../variables';
 
 export function render (pagedata, options, callback) {
   let theme          = includeTheme(options.theme);
-  let { renderFile } = setupEngine(theme.config.engine);
+  let { renderFile } = setupEngine(theme.config.engine.use);
 
   options = _.defaultsDeep(options, {
     src: VARS.ROOT_PATH,
@@ -38,23 +38,61 @@ export function render (pagedata, options, callback) {
   async.parallel(tasks, callback);
 }
 
-function setupEngine ({ use }) {
-  return require(use);
+function setupEngine (name) {
+  let _engine = require(name);
+  let _cache  = {};
 
-  // let engine = require(use);
-  // let cache  = {};
+  if ('pug' === name) {
+    return {
+      compile (file) {
+        let cache   = _cache[file];
+        let state    = fs.statSync(file);
+        let hsahCode = md5(file + state.size);
 
-  // return {
-  //   compile (content) {
-  //     let hashcode = md5(content);
-  //     if (_.isFunction(cache[hashcode])) {
-  //       return cache[hashcode];
-  //     }
+        if (!_.isEmpty(cache) && hsahCode === cache.hsahCode) {
+          return cache.render;
+        }
 
-  //     return cache[hashcode] = engine.compile(content);
-  //   },
-  //   render (content, data) {
-  //     return this.compile(content)(data);
-  //   },
-  // };
+        let render = _engine.compileFile(file);
+
+        _cache[file] = {
+          hsahCode : hsahCode,
+          render   : render,
+        };
+
+        return render;
+      },
+      render (file, data) {
+        return this.compile(file)(data);
+      },
+    };
+  }
+  else if ('ejs' === name) {
+    return {
+      compile (file) {
+        let cache   = _cache[file];
+        let state    = fs.statSync(file);
+        let hsahCode = md5(file + state.size);
+
+        if (!_.isEmpty(cache) && hsahCode === cache.hsahCode) {
+          return cache.render;
+        }
+
+        let content = fs.readFileSync(file);
+        let render  = _engine.compile(content);
+
+        _cache[file] = {
+          hsahCode : hsahCode,
+          render   : render,
+        };
+
+        return render;
+      },
+      render (file, data) {
+        return this.compile(file)(data);
+      },
+    };
+  }
+
+  throw new Error(`however ${name} is not supported`);
 }

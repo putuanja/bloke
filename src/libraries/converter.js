@@ -2,7 +2,6 @@ import _             from 'lodash';
 import fs            from 'fs-extra';
 import path          from 'path';
 import * as VARS     from '../variables';
-import { quickSort } from './utils';
 
 /**
  * load theme config
@@ -76,7 +75,7 @@ export function convertTheme (metadata, options) {
   /**
    * sort by datetime desc
    */
-  metadata = quickSort(metadata, true, 'date');
+  metadata = _.sortBy(metadata, true, 'date');
 
   let extracted = {};
   _.forEach(options.extractor, function (extractor) {

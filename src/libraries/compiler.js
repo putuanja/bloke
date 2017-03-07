@@ -82,7 +82,7 @@ export function compileFile (file, options = {}, callback) {
     return;
   }
 
-  let lastTime = new Date(state.mtime);
+  let lastTime = state.mtime;
   let hashcode = md5(file + state.size + lastTime);
   if (_.isObject(cache[hashcode])) {
     callback(null, cache[hashcode]);
@@ -95,7 +95,7 @@ export function compileFile (file, options = {}, callback) {
   let data     = formatMetadata(metadata, options.formatter);
 
   source = source
-  .replace(/^<!--.*-->$/ig, '')
+  .replace(/<!--.*?-->/ig, '')
   .replace(/\n{2,}/g, '');
 
   source = _.trim(source);

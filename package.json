@@ -1,0 +1,45 @@
+{
+  "name": "bloke",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "Blog generator",
+  "homepage": "https://github.com/DavidKk/bloke",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DavidKk/bloke.git"
+  },
+  "engines": {
+    "node": ">= 6.2.2"
+  },
+  "scripts": {
+    "eslint": "eslint ./src",
+    "test": "npm run eslint",
+    "start": "babel ./src --out-dir ./dist --watch"
+  },
+  "bin": {
+    "bloke": "./bin/bloke"
+  },
+  "author": "DavidJones",
+  "devDependencies": {
+    "babel-eslint": "^7.1.1",
+    "eslint": "^3.17.0",
+    "http-server": "^0.9.0"
+  },
+  "dependencies": {
+    "async": "^2.1.5",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-stage-0": "^6.22.0",
+    "babel-register": "^6.23.0",
+    "chokidar": "^1.6.1",
+    "colors": "^1.1.2",
+    "columnify": "^1.5.4",
+    "commander": "^2.9.0",
+    "fs-extra": "^2.0.0",
+    "highlight.js": "^9.9.0",
+    "ip": "^1.1.5",
+    "marked": "^0.3.6",
+    "pug": "^2.0.0-beta11",
+    "trim-html": "^0.1.7",
+    "xmlbuilder": "^8.2.2"
+  }
+}

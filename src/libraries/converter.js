@@ -1,30 +1,20 @@
-import _             from 'lodash';
-import fs            from 'fs-extra';
-import path          from 'path';
-import * as VARS     from '../variables';
+import _         from 'lodash';
+import path      from 'path';
+import * as VARS from '../variables';
 
 /**
  * load theme config
  * @param  {String} theme theme name or theme folder
  * @return {Object}
  */
-export function includeTheme (theme = 'default') {
-  let index  = _.indexOf(VARS.LOCAL_THEME, theme);
-  let folder = theme;
-
-  if (-1 !== index) {
-    let name = VARS.LOCAL_THEME[index];
-    folder = path.join(VARS.LOCAL_THEME_PATH, name);
-  }
-
-  if (!fs.existsSync(folder)) {
-    throw new Error(`theme folder '${folder}' is not exists, you can try to reinstall or change theme`);
-  }
-
-  let config = require(path.join(folder, './config.js'));
+export function includeTheme (theme = VARS.DEFAULT_THEME) {
+  let config = require(theme);
   config     = config.__esModule ? config.default : config;
 
-  return { assets: folder, config };
+  let jsfile = require.resolve(theme);
+  let assets = path.dirname(jsfile);
+
+  return { assets, config };
 }
 
 /**

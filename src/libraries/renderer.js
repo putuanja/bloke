@@ -7,8 +7,16 @@ import { includeTheme } from './converter';
 import * as VARS        from '../variables';
 
 export function render (pagedata, options, callback) {
-  let theme          = includeTheme(options.theme);
-  let { renderFile } = setupEngine(theme.config.engine.use);
+  if (3 > arguments.length) {
+    return render(pagedata, {}, options);
+  }
+
+  if (!_.isFunction(callback)) {
+    throw new Error('callback is not provided');
+  }
+
+  let theme  = includeTheme(options.theme);
+  let engine = setupEngine(theme.config.engine.use);
 
   options = _.defaultsDeep(options, {
     src: VARS.ROOT_PATH,
@@ -16,7 +24,7 @@ export function render (pagedata, options, callback) {
 
   let tasks = _.map(pagedata, function ({ data, template, output }) {
     return function (callback) {
-      let html = renderFile(template, _.assign({}, data, options.metadata));
+      let html = engine.renderFile(template, _.assign({}, data, options.metadata));
 
       fs.ensureDirSync(path.dirname(output));
 
@@ -44,7 +52,7 @@ function setupEngine (name) {
 
   if ('pug' === name) {
     return {
-      compile (file) {
+      compileFile (file) {
         let cache   = _cache[file];
         let state    = fs.statSync(file);
         let hsahCode = md5(file + state.size);
@@ -62,14 +70,14 @@ function setupEngine (name) {
 
         return render;
       },
-      render (file, data) {
-        return this.compile(file)(data);
+      renderFile (file, data) {
+        return this.compileFile(file)(data);
       },
     };
   }
   else if ('ejs' === name) {
     return {
-      compile (file) {
+      compileFile (file) {
         let cache   = _cache[file];
         let state    = fs.statSync(file);
         let hsahCode = md5(file + state.size);
@@ -88,8 +96,8 @@ function setupEngine (name) {
 
         return render;
       },
-      render (file, data) {
-        return this.compile(file)(data);
+      renderFile (file, data) {
+        return this.compileFile(file)(data);
       },
     };
   }

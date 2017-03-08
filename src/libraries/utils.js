@@ -5,9 +5,13 @@ import crypto    from 'crypto';
 import colors    from 'colors';
 import columnify from 'columnify';
 
-export function findFiles (regexp = /\.md$/, folder, callback) {
+export function findFiles (regexp = /\.md$/, folder, options, callback) {
   if (3 > arguments.length) {
-    return findFiles(/\.md$/, regexp, folder);
+    return findFiles(/\.md$/, regexp, {}, folder);
+  }
+
+  if (4 > arguments.length) {
+    return findFiles(/\.md$/, regexp, folder, options);
   }
 
   if (!_.isFunction(callback)) {
@@ -16,15 +20,28 @@ export function findFiles (regexp = /\.md$/, folder, callback) {
 
   if (!fs.existsSync(folder)) {
     callback(new Error('folder is not found'));
+    return;
   }
 
+  options = _.defaultsDeep(options, {
+    ignore: [/node_modules/],
+  });
+
+  let pwd   = process.cwd();
   let files = [];
   _.forEach(fs.readdirSync(folder), function (filename) {
-    let file = path.join(folder, filename);
+    let file     = path.join(folder, filename);
+    let relative = file.replace(pwd, '');
+
+    if (false === ignoreFile(relative, options.ignore)) {
+      return;
+    }
 
     if (fs.statSync(file).isDirectory()) {
-      findFiles(regexp, file, function (error, subFiles) {
-        files = files.concat(subFiles);
+      findFiles(regexp, file, options, function (error, subFiles) {
+        if (subFiles) {
+          files = files.concat(subFiles);
+        }
       });
     }
     else if (regexp.test(filename)) {
@@ -33,6 +50,16 @@ export function findFiles (regexp = /\.md$/, folder, callback) {
   });
 
   callback(null, files);
+}
+
+export function ignoreFile (group, filters) {
+  for (let i = 0, l = filters.length; i < l; i ++) {
+    if (filters[i].test(group)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 export function md5 (source) {

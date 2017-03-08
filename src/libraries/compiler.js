@@ -1,5 +1,6 @@
 import _        from 'lodash';
 import fs       from 'fs-extra';
+import path     from 'path';
 import hljs     from 'highlight.js';
 import async    from 'async';
 import marked   from 'marked';
@@ -115,6 +116,17 @@ export function compileFile (file, options = {}, callback) {
   .replace(/\\n/g, '\n')
   .replace(/\\r/g, '\r')
   .replace(/\\t/g, '\t');
+
+  if (_.isEmpty(data.title)) {
+    let filename = path.basename(file);
+    data.title   = filename.replace(path.extname(file), '');
+  }
+
+  data = _.defaultsDeep(data, {
+    tag      : '',
+    category : '',
+    author   : '',
+  });
 
   callback(null, cache[hashcode] = data);
 }

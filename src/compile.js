@@ -35,8 +35,8 @@ export function compile (folder = VARS.ROOT_PATH, options, callback) {
   options = _.defaultsDeep(options, {
     assets : folder,
     output : VARS.DISTRICT_PATH,
-    posts  : './posts',
-    theme  : 'default',
+    posts  : '.',
+    theme  : VARS.DEFAULT_THEME,
   });
 
   if (!path.isAbsolute(options.posts)) {

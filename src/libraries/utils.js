@@ -87,8 +87,6 @@ export function formatBytes (bytes, decimals) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-/* istanbul ignore if */
-
 /**
  * print stats
  */

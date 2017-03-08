@@ -3,13 +3,8 @@
 
 
 # Temporary folders
-.temporary
-.dist
-/vhosts
-
-
-# Logs
-/logs
+/.temporary
+/.nyc_output
 
 
 # Coverage directory used by tools like istanbul

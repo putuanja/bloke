@@ -1,4 +1,4 @@
-[![GitHub version](https://badge.fury.io/gh/DavidKk%2Fngwp.svg)](https://badge.fury.io/gh/DavidKk%2Fbloke)
+[![GitHub version](https://badge.fury.io/gh/DavidKk%2F2Fbloke.svg)](https://badge.fury.io/gh/DavidKk%2Fbloke)
 [![npm version](https://badge.fury.io/js/bloke.svg)](https://badge.fury.io/js/bloke)
 [![Build Status](https://travis-ci.org/DavidKk/bloke.svg?branch=master)](https://travis-ci.org/DavidKk/bloke)
 [![Build status](https://ci.appveyor.com/api/projects/status/p76hetxe0us38axx?svg=true)](https://ci.appveyor.com/project/DavidKk/bloke)

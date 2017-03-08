@@ -1,6 +1,5 @@
 import _          from 'lodash';
 import fs         from 'fs-extra';
-import path       from 'path';
 import xmlbuilder from 'xmlbuilder';
 import dateformat from 'dateformat';
 import * as VARS  from '../variables';
@@ -40,12 +39,12 @@ export function build (files, options, callback) {
   .att('xsi:schemaLocation', 'http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd');
 
   _.forEach(options.map, function (siteUrl) {
-    let url = urlset.ele('url')
+    let url = urlset.ele('url');
 
-    url.ele('loc').txt(siteUrl)
-    url.ele('lastmod').txt(options.lastMod)
-    url.ele('changefreq').txt(options.changefreq)
-    url.ele('priority').txt(options.priority)
+    url.ele('loc').txt(siteUrl);
+    url.ele('lastmod').txt(options.lastMod);
+    url.ele('changefreq').txt(options.changefreq);
+    url.ele('priority').txt(options.priority);
   });
 
   _.forEach(files, function (file) {

@@ -100,9 +100,11 @@ export function compile (folder = VARS.ROOT_PATH, options, callback) {
         });
       });
 
-      let closeHandle = watcher.close.bind(watcher);
-      process.on('exit', closeHandle);
-      process.on('SIGINT', closeHandle);
+      process.on('exit', watcher.close.bind(watcher));
+      process.on('SIGINT', function () {
+        watcher.close();
+        process.exit();
+      });
     }
   });
 

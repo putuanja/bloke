@@ -56,27 +56,27 @@ program
       });
 
       printStats(info);
-
-      /**
-       * watch and create server
-       */
-      if (options.watch && options.server) {
-        trace(colors.bold(colors.white('Access URLs:')));
-
-        server({
-          root : options.output && (path.isAbsolute(options.output) ? options.output : path.join(pwd, options.output)),
-          port : options.serverPort || 9871,
-        },
-        function (error, server, stats) {
-          if (error) {
-            throw error;
-          }
-
-          printByPad(stats);
-        });
-      }
     });
   });
+
+  /**
+   * watch and create server
+   */
+  if (options.server) {
+    trace(colors.bold(colors.white('Access URLs:')));
+
+    server({
+      root : options.output && (path.isAbsolute(options.output) ? options.output : path.join(pwd, options.output)),
+      port : options.serverPort || 9871,
+    },
+    function (error, server, stats) {
+      if (error) {
+        throw error;
+      }
+
+      printByPad(stats);
+    });
+  }
 });
 
 program.parse(process.argv);

@@ -1,7 +1,8 @@
-import _                from 'lodash';
-import ip               from 'ip';
-import { createServer } from 'http-server';
-import * as VARS        from './variables';
+import _              from 'lodash';
+import ip             from 'ip';
+import localWebServer from 'local-web-server';
+import { trace }      from './libraries/utils';
+import * as VARS      from './variables';
 
 export function server (options, callback) {
   if (2 > arguments.length) {
@@ -13,21 +14,29 @@ export function server (options, callback) {
   }
 
   options = _.defaultsDeep(options, {
-    port : 8080,
-    host : '0.0.0.0',
-    root : VARS.DISTRICT_PATH,
+    gzip    : true,
+    port    : 8080,
+    host    : '0.0.0.0',
+    root    : VARS.DISTRICT_PATH,
+    verbose : false,
   });
 
-  let serv = createServer(options);
+  let serv = localWebServer({
+    compress   : options.gzip,
+    verbose    : process.env.SILENT ? false : options.verbose,
+    static     : {
+      root: options.root,
+    },
+    serveIndex : {
+      path: options.root,
+    },
+  });
+
   serv.listen(options.port, options.host, function (error) {
     if (error) {
       callback(error);
       return;
     }
-
-    let closeHandle = serv.close.bind(serv);
-    process.on('exit', closeHandle);
-    process.on('SIGINT', closeHandle);
 
     callback(null, serv, [
       {

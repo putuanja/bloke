@@ -1,4 +1,3 @@
-import _                         from 'lodash';
 import path                      from 'path';
 import colors                    from 'colors';
 import program                   from 'commander';
@@ -9,9 +8,10 @@ import {
   printStats,
   printByPad,
 }                                from './libraries/utils';
-import { build as buildSiteMap } from './libraries/sitemap';
 import { version }               from '../package.json';
-import * as VARS                 from './variables';
+import { resolvePath }           from './libraries/utils';
+
+let log = trace.bind(`[${colors.cyan('BK')}] `);
 
 program
 .version(version);
@@ -19,8 +19,8 @@ program
 program
 .usage('<folder> [options]')
 .arguments('<folder>')
-.option('-t, --theme <folder[, name]>', 'set theme folder or theme name (default is default theme)')
-.option('-o, --output <folder>', 'set output folder')
+.option('--output <folder>', 'set output folder')
+.option('--config <file>', 'set bloke config file')
 .option('--sitemap', 'set sitemap file')
 .option('--sitemap-options', 'set sitemap build config')
 .option('--server', 'open dev server')
@@ -31,6 +31,17 @@ program
   let pwd       = path.join(process.cwd(), folder);
   let startTime = Date.now();
 
+  if (options.sitemapOptions) {
+    try {
+      options.sitemapOptions = JSON.parse(options.sitemapOptions);
+    }
+    catch (err) {
+      log(colors.yellow('sitemap-options is invalid'));
+
+      options.sitemapOptions = {};
+    }
+  }
+
   /**
    * compile markdown to HTML
    */
@@ -39,24 +50,10 @@ program
       throw error;
     }
 
-    let files = _.map(stats, function ({ file }) {
-      return file.replace(VARS.DISTRICT_PATH, '');
-    });
+    trace('Compiler: Markdown');
+    trace(`Time: ${colors.bold(colors.white(Date.now() - startTime))}ms\n`);
 
-    let sitemapConfig = _.defaultsDeep(options.sitemapOptions, { output: options.sitemap });
-
-    buildSiteMap(files, sitemapConfig, function (error, sitemapState) {
-      stats.push(sitemapState);
-
-      trace('Compiler: Markdown');
-      trace(`Time: ${colors.bold(colors.white(Date.now() - startTime))}ms\n`);
-
-      let info = _.map(stats, function (state) {
-        return _.pick(state, ['assets', 'size']);
-      });
-
-      printStats(info);
-    });
+    printStats(stats);
   });
 
   /**
@@ -66,7 +63,7 @@ program
     trace(colors.bold(colors.white('Access URLs:')));
 
     server({
-      root : options.output && (path.isAbsolute(options.output) ? options.output : path.join(pwd, options.output)),
+      root : options.output && resolvePath(options.output, pwd),
       port : options.serverPort || 9871,
     },
     function (error, server, stats) {

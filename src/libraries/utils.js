@@ -68,6 +68,14 @@ export function md5 (source) {
   return md5sum.digest('hex');
 }
 
+export function resolvePath (file = './', cwd = process.cwd()) {
+  if (path.isAbsolute(file)) {
+    return file;
+  }
+
+  return path.join(cwd, file);
+}
+
 /**
  * format size by unit
  * @param  {Number} bytes    size

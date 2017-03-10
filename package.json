@@ -10,7 +10,7 @@
     "url": "https://github.com/DavidKk/bloke.git"
   },
   "engines": {
-    "node": ">= 6.2.2"
+    "node": ">= 7.6.0"
   },
   "scripts": {
     "eslint": "eslint ./src",
@@ -36,6 +36,8 @@
     "local-web-server": "^1.2.6",
     "mocha": "^3.2.0",
     "nyc": "^10.1.2",
+    "object.observe": "^0.2.6",
+    "observed": "^1.1.2",
     "sinon": "^1.17.7"
   },
   "dependencies": {

@@ -1,7 +1,6 @@
 import _              from 'lodash';
 import ip             from 'ip';
 import localWebServer from 'local-web-server';
-import { trace }      from './libraries/utils';
 import * as VARS      from './variables';
 
 export function server (options, callback) {

@@ -1,21 +1,5 @@
-import _         from 'lodash';
-import path      from 'path';
-import * as VARS from '../variables';
-
-/**
- * load theme config
- * @param  {String} theme theme name or theme folder
- * @return {Object}
- */
-export function includeTheme (theme = VARS.DEFAULT_THEME) {
-  let config = require(theme);
-  config     = config.__esModule ? config.default : config;
-
-  let jsfile = require.resolve(theme);
-  let assets = path.dirname(jsfile);
-
-  return { assets, config };
-}
+import _               from 'lodash';
+import { resolvePath } from './utils';
 
 /**
  * convert meta data according to theme config
@@ -27,12 +11,12 @@ export function includeTheme (theme = VARS.DEFAULT_THEME) {
  * @param  {Integer} options.page.perpage show data per page (default 10)
  * @return {Object}
  */
-export function convertTheme (metadata, options) {
-  options = _.mergeWith({
-    assets    : './',
-    output    : VARS.DISTRICT_PATH,
-    renderer  : [],
-    extractor : [
+export function convert (metadata, options) {
+  /**
+   * sort by datetime desc
+   */
+  options  = _.defaultsDeep(options, {
+    extractor: [
       {
         name: 'articles',
       },
@@ -52,19 +36,8 @@ export function convertTheme (metadata, options) {
         cite : 'author',
       },
     ],
-    page      : {
-      perPage: 10,
-    },
-  },
-  options, function (objValue, srcValue) {
-    if (_.isArray(objValue)) {
-      return objValue.concat(srcValue);
-    }
   });
 
-  /**
-   * sort by datetime desc
-   */
   metadata = _.sortBy(metadata, true, 'date');
 
   let extracted = {};
@@ -149,9 +122,7 @@ function extract (metadatas, extractor) {
  */
 function serialize (source, renderers, options) {
   let datas = _.map(renderers, function ({ template, output, picker }) {
-    if (!path.isAbsolute(template)) {
-      template = path.join(options.assets, template);
-    }
+    template = resolvePath(template, options.template);
 
     if (_.isFunction(picker)) {
       let pagedata = picker(source, options.page);
@@ -161,20 +132,15 @@ function serialize (source, renderers, options) {
       }
 
       _.forEach(pagedata, function (item) {
-        item.template = template;
-
-        if (!path.isAbsolute(item.output)) {
-          item.output = path.join(options.output, item.output);
-        }
+        item.template = resolvePath(item.template || template, options.template);
+        item.output   = resolvePath(item.output, options.output);
       });
 
       return _.defaultsDeep(pagedata, { data: {} });
     }
 
     if (!_.isEmpty(output)) {
-      if (!path.isAbsolute(output)) {
-        output = path.join(options.output, output);
-      }
+      output = resolvePath(output, options.output);
 
       let data = _.pick(source, _.isArray(picker) ? picker : [picker]);
       return { template, output, data };

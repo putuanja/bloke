@@ -1,10 +1,9 @@
-import _                from 'lodash';
-import fs               from 'fs-extra';
-import path             from 'path';
-import async            from 'async';
-import { md5 }          from './utils';
-import { includeTheme } from './converter';
-import * as VARS        from '../variables';
+import _         from 'lodash';
+import fs        from 'fs-extra';
+import path      from 'path';
+import async     from 'async';
+import { md5 }   from './utils';
+import * as VARS from '../variables';
 
 export function render (pagedata, options, callback) {
   if (3 > arguments.length) {
@@ -15,14 +14,8 @@ export function render (pagedata, options, callback) {
     throw new Error('callback is not provided');
   }
 
-  let theme  = includeTheme(options.theme);
-  let engine = setupEngine(theme.config.engine.use);
-
-  options = _.defaultsDeep(options, {
-    src: VARS.ROOT_PATH,
-  });
-
-  let tasks = _.map(pagedata, function ({ data, template, output }) {
+  let engine = setupEngine(_.get(options, 'engine.use'));
+  let tasks  = _.map(pagedata, function ({ data, template, output }) {
     return function (callback) {
       let html = engine.renderFile(template, _.assign({}, data, options.metadata));
 
@@ -36,7 +29,7 @@ export function render (pagedata, options, callback) {
 
         callback(null, {
           file   : output,
-          assets : output.replace(options.src, ''),
+          assets : output.replace(VARS.ROOT_PATH, ''),
           size   : html.length,
         });
       });

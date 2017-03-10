@@ -1,18 +1,19 @@
 import _                           from 'lodash';
 import fs                          from 'fs-extra';
 import path                        from 'path';
+import async                       from 'async';
 import colors                      from 'colors';
 import chokidar                    from 'chokidar';
+import { build as buildSiteMap }   from './libraries/sitemap';
 import { compile as compileFiles } from './libraries/compiler';
-import {
-  convertTheme,
-  includeTheme,
-}                                  from './libraries/converter';
+import { convert }                 from './libraries/converter';
 import { render }                  from './libraries/renderer';
 import {
   trace,
   findFiles,
+  resolvePath,
 }                                  from './libraries/utils';
+import { OptionMerger }            from './libraries/option_merger';
 import * as VARS                   from './variables';
 
 export function compile (folder = VARS.ROOT_PATH, options, callback) {
@@ -20,121 +21,149 @@ export function compile (folder = VARS.ROOT_PATH, options, callback) {
     throw new Error('callback is not provided');
   }
 
-  /**
-   * read rc file to load config
-   */
-  let rc = path.join(folder, './.blogrc');
-  if (fs.existsSync(rc)) {
-    let _options = fs.readJSONSync(rc);
-    options = _.defaultsDeep(options, _options);
-  }
-
-  /**
-   * set default config
-   */
   options = _.defaultsDeep(options, {
-    assets : folder,
-    output : VARS.DISTRICT_PATH,
-    posts  : '.',
-    theme  : VARS.DEFAULT_THEME,
+    sitemap: 'sitemap.xml',
   });
 
-  if (!path.isAbsolute(options.posts)) {
-    options.posts = path.join(options.assets, options.posts);
-  }
+  let rcfile      = resolvePath(options.config || './bloke.config.js', folder);
+  let blogOptions = new OptionMerger(rcfile, {
+    root   : VARS.ROOT_PATH,
+    src    : path.join(VARS.ROOT_PATH, './posts'),
+    output : path.join(VARS.ROOT_PATH, './blog'),
+    ignore : [/node_modules/],
+  },
+  function () {
+    this.src = resolvePath(this.src, this.root);
+    this.output = resolvePath(this.output, this.root);
+  });
+
+  let themeOptions = new OptionMerger(options.theme || VARS.DEFAULT_THEME, {
+    root      : '',
+    template  : './',
+    assets    : './',
+    output    : blogOptions.config('output'),
+    ignore    : [/node_modules/],
+    renderer  : [],
+    extractor : [],
+    page      : {
+      perPage: 10,
+    },
+  },
+  function () {
+    this.template = resolvePath(this.template, this.root);
+    this.assets = resolvePath(this.assets, this.root);
+  });
+
+  let blogSetting  = blogOptions.config();
+  let themeSetting = themeOptions.config();
 
   /**
-   * load theme config
+   * start to compile files
    */
-  let theme = includeTheme(options.theme);
+  let runCompile = function () {
+    async.parallel([
+      /**
+       * convert markdown file to object data
+       */
+      function (callback) {
+        findFiles(blogSetting.src, function (error, files) {
+          compileFiles(files, options, function (error, metadata) {
+            if (error) {
+              callback(error);
+              return;
+            }
 
-  findFiles(options.posts, function (error, files) {
-    if (error) {
-      callback(error);
-      return;
-    }
+            let pagedata = convert(metadata, themeSetting);
+            render(pagedata, _.defaultsDeep({ metadata }, themeSetting), function (error, stats) {
+              if (error) {
+                callback(error);
+                return;
+              }
 
-    convert(files, options, callback);
+              if (!options.sitemap) {
+                let info = _.map(stats, function (state) {
+                  return _.pick(state, ['assets', 'size']);
+                });
 
-    if (true === options.watch) {
-      let log      = trace.bind(null, `[${colors.blue('Watcher')}] `);
-      let watcher  = chokidar.watch(options.posts);
-      let oriFiles = _.clone(files) || [];
-      let oriSizes = _.map(files, function (file) {
-        return fs.statSync(file).size;
-      });
+                callback(null, info);
+                return;
+              }
 
-      watcher.on('add', function (file) {
-        if ('.md' === path.extname(file) && -1 === _.find(oriFiles, file)) {
-          log(`'${colors.green(file)} has been created.\n'`);
+              let files = _.map(stats, function ({ file }) {
+                return file.replace(VARS.ROOT_PATH, '');
+              });
 
-          oriFiles.push(file);
-          oriSizes.push(fs.statSync(file).size);
-          watcher.add(file);
-        }
-      });
+              buildSiteMap(files, options.sitemapOptions, function (error, state) {
+                if (error) {
+                  callback(error);
+                  return;
+                }
 
-      watcher.on('unlink', function (file) {
-        let index = _.indexOf(oriFiles, file);
+                stats.push(state);
 
-        if (-1 !== index) {
-          log(`'${colors.green(file)} has been removed.\n'`);
+                let info = _.map(stats, function (state) {
+                  return _.pick(state, ['assets', 'size']);
+                });
 
-          oriFiles.splice(index, 1);
-          oriSizes.splice(index, 1);
-          watcher.unwatch(file);
-        }
-      });
-
-      watcher.on('change', function (file) {
-        fs.stat(file, function (error, stat) {
-          if (error) {
+                callback(null, info);
+              });
+            });
+          });
+        });
+      },
+      /**
+       * copy static files
+       */
+      function (callback) {
+        fs.exists(themeSetting.assets, function (error) {
+          if (error instanceof Error) {
+            callback(error);
             return;
           }
 
-          let index = _.indexOf(oriFiles, file);
-          if (-1 !== index && oriSizes[index] !== stat.size) {
-            log(`'${colors.green(file)}' has been changed.\n`);
-            convert(files, options, callback);
-          }
+          fs.copy(themeSetting.assets, themeSetting.output, function (error) {
+            if (error) {
+              callback(error);
+              return;
+            }
+
+            callback(null);
+          });
         });
-      });
-
-      process.on('exit', watcher.close.bind(watcher));
-      process.on('SIGINT', function () {
-        watcher.close();
-        process.exit();
-      });
-    }
-  });
-
-  function convert (files, options, callback) {
-    /**
-     * convert markdown file to object data
-     */
-    compileFiles(files, options, function (error, metadata) {
+      },
+    ],
+    function (error, result) {
       if (error) {
         callback(error);
         return;
       }
 
-      /**
-       * convert meta data according to theme config
-       */
-      let setting = _.assign({
-        assets : theme.assets,
-        output : options.output,
-      }, theme.config);
+      let [files] = result;
+      callback(null, files);
+    });
+  };
 
-      let pagedata = convertTheme(metadata, setting);
+  runCompile();
 
-      /**
-       * render page data
-       */
-      render(pagedata, {
-        metadata : metadata,
-        theme    : options.theme,
-      }, callback);
+  if (true === options.watch) {
+    let log     = trace.bind(`[${colors.blue('Watcher')}] `);
+    let watcher = chokidar.watch(blogSetting.src);
+
+    watcher.add(themeSetting.assets);
+
+    watcher.on('all', function (file) {
+      if ('.md' === path.extname(file)) {
+        log(`'${colors.green(file)} has been created.\n'`);
+
+        runCompile();
+      }
+    });
+
+    process.on('exit', watcher.close.bind(watcher));
+    process.on('SIGINT', function () {
+      watcher.close();
+
+      process.exit();
     });
   }
 }

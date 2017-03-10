@@ -1,33 +1,16 @@
 /* eslint max-nested-callbacks: off */
 /* eslint-env mocha */
 
-import _          from 'lodash';
-import fs         from 'fs-extra';
-import path       from 'path';
-import { expect } from 'chai';
-import {
-  includeTheme,
-  convertTheme,
-}                 from '../src/libraries/converter';
-import { md5 }    from '../src/libraries/utils';
-import * as VARS  from '../src/variables';
+import _           from 'lodash';
+import fs          from 'fs-extra';
+import path        from 'path';
+import { expect }  from 'chai';
+import { convert } from '../src/libraries/converter';
+import { md5 }     from '../src/libraries/utils';
+import * as VARS   from '../src/variables';
 
 describe('Theme Compiler', function () {
   describe('create new data by configure of theme', function () {
-    it('can include theme config', function () {
-      let theme       = includeTheme(VARS.DEFAULT_THEME);
-      let themeConfig = require(VARS.DEFAULT_THEME);
-      let themeFolder = require.resolve(VARS.DEFAULT_THEME);
-
-      themeConfig = themeConfig.__esModule ? themeConfig.default : themeConfig
-
-      expect(theme).to.have.property('assets');
-      expect(theme).to.have.property('config');
-
-      expect(theme.assets).to.equal(path.dirname(themeFolder));
-      expect(theme.config).to.deep.equal(themeConfig);
-    });
-
     it('can convert new formated data by config', function () {
       let metadata = {
         hashcode : 'b2ea23db3e2948c7e4b57fd8ca3864ca',
@@ -55,7 +38,7 @@ describe('Theme Compiler', function () {
         ],
       };
 
-      let pagedatas = convertTheme([metadata], options);
+      let pagedatas = convert([metadata], options);
       let pagedata  = pagedatas[0];
 
       expect(pagedata).to.have.property('output');
@@ -67,7 +50,7 @@ describe('Theme Compiler', function () {
       expect(pagedata).to.have.deep.property('data.authors');
 
       expect(pagedata.output).to.equal(path.join(options.output, output));
-      expect(pagedata.template).to.equal(path.join(options.renderer[0].template));
+      expect(pagedata.template).to.equal(path.join(VARS.ROOT_PATH, options.renderer[0].template));
 
       expect(pagedata.data.articles).to.be.an('array');
       expect(pagedata.data.tags).to.be.an('object');

@@ -43,6 +43,9 @@ describe('Render HTML Files', function () {
       };
 
       let options = {
+        engine: {
+          use: 'pug',
+        },
         src: VARS.TEMPORARY_PATH,
       };
 
@@ -57,8 +60,7 @@ describe('Render HTML Files', function () {
 
         expect(page.file).to.equal(pagedata.output);
         expect(fs.existsSync(page.file)).to.be.true;
-
-        expect(page.assets).to.equal(page.file.replace(options.src, ''));
+        expect(page.assets).to.equal(page.file.replace(VARS.ROOT_PATH, ''));
 
         let state = fs.statSync(page.file);
         expect(page.size).to.equal(state.size);

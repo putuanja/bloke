@@ -1,5 +1,6 @@
 import _          from 'lodash';
 import fs         from 'fs-extra';
+import path       from 'path';
 import xmlbuilder from 'xmlbuilder';
 import dateformat from 'dateformat';
 import * as VARS  from '../variables';
@@ -14,7 +15,7 @@ export function build (files, options, callback) {
   }
 
   options = _.defaultsDeep(options, {
-    output     : 'sitemap.xml',
+    output     : path.join(VARS.ROOT_PATH, './sitemap.xml'),
     changefreq : 'weekly',
     fileName   : 'sitemap',
     siteRoot   : '/',
@@ -75,7 +76,7 @@ export function build (files, options, callback) {
 
     callback(null, {
       file   : options.output,
-      assets : options.output.replace(VARS.EXECUTE_PATH, ''),
+      assets : options.output.replace(VARS.ROOT_PATH, ''),
       size   : xmlString.length,
     });
   });

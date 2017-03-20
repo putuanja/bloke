@@ -2,9 +2,11 @@ import _           from 'lodash';
 import path        from 'path';
 import colors      from 'colors';
 import program     from 'commander';
+import chokidar    from 'chokidar';
 import { compile } from './compiler';
 import * as utils  from './libraries/utils';
 import * as VARS   from './libraries/variables';
+import * as server from './libraries/server';
 import { version } from '../package.json';
 
 let log = utils.trace.bind(`[${colors.cyan('BK')}] `);
@@ -20,7 +22,6 @@ program
 .option('--sitemap-options', 'set sitemap build config')
 .option('--server', 'open dev server')
 .option('--server-port', 'set server port')
-.option('--webpack <config file>', 'set webpack config (default root webpack)')
 .option('--watch', 'listen file changed')
 .action(compileAction);
 
@@ -65,24 +66,67 @@ function compileAction (folder = VARS.ROOT_PATH, params) {
     }
   }
 
-  compile(pwd, VARS.DISTRICT_PATH, {
-    bloke   : blokeSetting,
-    theme   : themeSetting,
-    sitemap : sitemapSetting,
-  },
-  function (error, stats) {
-    if (error) {
-      throw error;
+  let startCompile = function (done) {
+    compile(pwd, VARS.DISTRICT_PATH, {
+      bloke   : blokeSetting,
+      theme   : themeSetting,
+      sitemap : sitemapSetting,
+    },
+    function (error, stats) {
+      if (error) {
+        throw error;
+      }
+
+      utils.trace('Compiler: Markdown');
+      utils.trace(`Time: ${colors.bold(colors.white(Date.now() - startTime))}ms\n`);
+
+      stats = _.map(stats, function ({ assets, size }) {
+        return { assets, size };
+      });
+
+      utils.printStats(stats);
+
+      _.isFunction(done) && done();
+    });
+  };
+
+  startCompile(function () {
+    if (true === params.watch) {
+      let log     = utils.trace.bind(`[${colors.blue('Watcher')}] `);
+      let watcher = chokidar.watch(blokeSetting.src);
+
+      watcher.add(themeSetting.assets);
+
+      watcher.on('all', function (file) {
+        if ('.md' === path.extname(file)) {
+          log(`'${colors.green(file)} has been created.\n'`);
+
+          startCompile();
+        }
+      });
+
+      process.on('exit', watcher.close.bind(watcher));
+      process.on('SIGINT', function () {
+        watcher.close();
+        process.exit();
+      });
     }
 
-    utils.trace('Compiler: Markdown');
-    utils.trace(`Time: ${colors.bold(colors.white(Date.now() - startTime))}ms\n`);
+    if (true === params.server) {
+      utils.trace(colors.bold(colors.white('Access URLs:')));
 
-    stats = _.map(stats, function ({ assets, size }) {
-      return { assets, size };
-    });
+      server.start({
+        root : blokeSetting.output,
+        port : params.serverPort || 9871,
+      },
+      function (error, server, stats) {
+        if (error) {
+          throw error;
+        }
 
-    utils.printStats(stats);
+        utils.printByPad(stats);
+      });
+    }
   });
 }
 

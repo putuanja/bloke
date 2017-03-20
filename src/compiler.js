@@ -2,9 +2,6 @@ import _             from 'lodash';
 import fs            from 'fs-extra';
 import path          from 'path';
 import async         from 'async';
-import colors        from 'colors';
-import chokidar      from 'chokidar';
-import * as server   from './libraries/server';
 import * as sitemap  from './libraries/sitemap';
 import * as markdown from './libraries/markdown';
 import * as renderer from './libraries/renderer';
@@ -83,61 +80,17 @@ export function compile (folder = VARS.ROOT_PATH, output = VARS.DISTRICT_PATH, o
     async.parallel(tasks, callback);
   };
 
-  let start = (done) => {
-    async.parallel([
-      transformFile,
-      copyStatic,
-    ],
-    function (error, result) {
-      if (error) {
-        callback(error);
-        return;
-      }
-
-      let [files] = result;
-      callback(null, files);
-
-      _.isFunction(done) && done();
-    });
-  };
-
-  start(function () {
-    if (true === options.watch) {
-      let log     = utils.trace.bind(`[${colors.blue('Watcher')}] `);
-      let watcher = chokidar.watch(options.bloke.src);
-
-      watcher.add(options.theme.assets);
-
-      watcher.on('all', function (file) {
-        if ('.md' === path.extname(file)) {
-          log(`'${colors.green(file)} has been created.\n'`);
-
-          start();
-        }
-      });
-
-      process.on('exit', watcher.close.bind(watcher));
-      process.on('SIGINT', function () {
-        watcher.close();
-
-        process.exit();
-      });
+  async.parallel([
+    transformFile,
+    copyStatic,
+  ],
+  function (error, result) {
+    if (error) {
+      callback(error);
+      return;
     }
 
-    if (true === options.server) {
-      utils.trace(colors.bold(colors.white('Access URLs:')));
-
-      server({
-        root : options.bloke.output,
-        port : options.serverPort || 9871,
-      },
-      function (error, server, stats) {
-        if (error) {
-          throw error;
-        }
-
-        utils.printByPad(stats);
-      });
-    }
+    let [files] = result;
+    callback(null, files);
   });
 }

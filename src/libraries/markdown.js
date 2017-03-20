@@ -83,8 +83,11 @@ export function transform (metadata, options) {
         },
       },
       {
-        name : 'archives',
+        name : 'categories',
         cite : 'category',
+        resolve : function (item) {
+          return (item.category || '').split(',');
+        },
       },
       {
         name : 'authors',

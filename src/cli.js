@@ -1,4 +1,5 @@
 import _           from 'lodash';
+import fs          from 'fs-extra';
 import path        from 'path';
 import colors      from 'colors';
 import program     from 'commander';
@@ -9,7 +10,7 @@ import * as VARS   from './libraries/variables';
 import * as server from './libraries/server';
 import { version } from '../package.json';
 
-let log = utils.trace.bind(`[${colors.cyan('BK')}] `);
+let log = utils.trace.bind(null, `[${colors.cyan('BK')}]`);
 
 program
 .version(version);
@@ -67,6 +68,9 @@ function compileAction (folder = VARS.ROOT_PATH, params) {
   }
 
   let startCompile = function (done) {
+    log(`clean up ${colors.green(blokeSetting.output)} ...`);
+    fs.removeSync(blokeSetting.output);
+
     compile(pwd, VARS.DISTRICT_PATH, {
       bloke   : blokeSetting,
       theme   : themeSetting,
@@ -92,7 +96,6 @@ function compileAction (folder = VARS.ROOT_PATH, params) {
 
   startCompile(function () {
     if (true === params.watch) {
-      let log     = utils.trace.bind(`[${colors.blue('Watcher')}] `);
       let watcher = chokidar.watch(blokeSetting.src);
 
       watcher.add(themeSetting.assets);

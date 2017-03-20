@@ -5,8 +5,8 @@ import _          from 'lodash';
 import fs         from 'fs-extra';
 import path       from 'path';
 import { expect } from 'chai';
-import { render } from '../src/libraries/renderer';
-import * as VARS  from '../src/variables';
+import { render } from '../../src/libraries/renderer';
+import * as VARS  from '../../src/libraries/variables';
 
 describe('Render HTML Files', function () {
   describe('render html by converted datas', function () {

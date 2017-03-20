@@ -3,9 +3,9 @@ import ip             from 'ip';
 import localWebServer from 'local-web-server';
 import * as VARS      from './variables';
 
-export function server (options, callback) {
+export function start (options, callback) {
   if (2 > arguments.length) {
-    return server({}, options);
+    return start({}, options);
   }
 
   if (!_.isFunction(callback)) {

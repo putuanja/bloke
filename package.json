@@ -14,7 +14,7 @@
   },
   "scripts": {
     "eslint": "eslint ./src",
-    "mocha": "mocha --require babel-polyfill --compilers js:babel-register ./unitest/*.spec.js",
+    "mocha": "mocha --require babel-polyfill --compilers js:babel-register ./unitest/**/*.spec.js",
     "test": "npm run eslint && npm run mocha",
     "coverage": "rimraf ./coverage && nyc --reporter=text --reporter=lcov --report-dir=./coverage/cli npm run test && rimraf ./.temporary",
     "coveralls": "nyc --reporter=text-lcov npm run test | coveralls",

@@ -3,7 +3,7 @@ import fs        from 'fs-extra';
 import path      from 'path';
 import async     from 'async';
 import { md5 }   from './utils';
-import * as VARS from '../variables';
+import * as VARS from './variables';
 
 export function render (pagedata, options, callback) {
   if (3 > arguments.length) {
@@ -14,10 +14,10 @@ export function render (pagedata, options, callback) {
     throw new Error('callback is not provided');
   }
 
-  let engine = setupEngine(_.get(options, 'engine.use'));
+  let engine = setupEngine(options.engine.use);
   let tasks  = _.map(pagedata, function ({ data, template, output }) {
     return function (callback) {
-      let html = engine.renderFile(template, _.assign({}, data, options.metadata));
+      let html = engine.renderFile(template, _.assign({}, data, { __metadata__: pagedata }));
 
       fs.ensureDirSync(path.dirname(output));
 

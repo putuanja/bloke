@@ -3,7 +3,7 @@ import fs         from 'fs-extra';
 import path       from 'path';
 import xmlbuilder from 'xmlbuilder';
 import dateformat from 'dateformat';
-import * as VARS  from '../variables';
+import * as VARS  from './variables';
 
 export function build (files, options, callback) {
   if (3 > arguments.length) {

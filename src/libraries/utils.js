@@ -14,6 +14,10 @@ export function findFiles (regexp = /\.md$/, folder, options, callback) {
     return findFiles(/\.md$/, regexp, folder, options);
   }
 
+  if (!_.isString(folder)) {
+    throw new Error('folder must be a string');
+  }
+
   if (!_.isFunction(callback)) {
     throw new Error('callback is not provided');
   }
@@ -122,6 +126,7 @@ export function printStats (stats, options) {
     config: {
       assets: {
         align: 'right',
+        maxWidth: 30,
         dataTransform (file) {
           return colors.green(file).bold;
         },

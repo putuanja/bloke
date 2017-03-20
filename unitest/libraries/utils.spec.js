@@ -1,17 +1,13 @@
 /* eslint max-nested-callbacks: off */
 /* eslint-env mocha */
 
-import _          from 'lodash';
-import fs         from 'fs-extra';
-import path       from 'path';
-import async      from 'async';
-import { expect } from 'chai';
-import {
-  findFiles,
-  formatBytes,
-  trace,
-}                 from '../src/libraries/utils';
-import * as VARS  from '../src/variables';
+import _             from 'lodash';
+import fs            from 'fs-extra';
+import path          from 'path';
+import async         from 'async';
+import { expect }    from 'chai';
+import { findFiles } from '../../src/libraries/utils';
+import * as VARS     from '../../src/libraries/variables';
 
 describe('Utilities Test', function () {
   describe('test function findFiles', function () {

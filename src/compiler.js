@@ -39,7 +39,7 @@ export function compile (folder = VARS.ROOT_PATH, output = VARS.DISTRICT_PATH, o
           return file.replace(folder, '');
         });
 
-        sitemap.build(files, options.sitemapOptions, function (error, sitemapStats) {
+        sitemap.build(files, options.sitemap, function (error, sitemapStats) {
           if (error) {
             callback(error);
             return;

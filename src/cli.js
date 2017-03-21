@@ -67,6 +67,14 @@ function compileAction (folder = VARS.ROOT_PATH, params) {
     }
   }
 
+  sitemapSetting = _.defaultsDeep(sitemapSetting, {
+    output: path.join(blokeSetting.output, './sitemap.xml'),
+  });
+
+  if (sitemapSetting.output) {
+    utils.resolvePath(sitemapSetting.output, blokeSetting.output);
+  }
+
   let startCompile = function (done) {
     log(`clean up ${colors.green(blokeSetting.output)} ...`);
     fs.removeSync(blokeSetting.output);

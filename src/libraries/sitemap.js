@@ -15,7 +15,7 @@ export function build (files, options, callback) {
   }
 
   options = _.defaultsDeep(options, {
-    output     : path.join(VARS.ROOT_PATH, './sitemap.xml'),
+    output     : path.join(options.output || VARS.DISTRICT_PATH, './sitemap.xml'),
     changefreq : 'weekly',
     fileName   : 'sitemap',
     siteRoot   : '/',

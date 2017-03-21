@@ -76,7 +76,7 @@ describe('Markdown Converter', function () {
       };
 
       let output = './index.html';
-      let picker = function (data, setting) {
+      let picker = function (data) {
         return { output, data };
       };
 
@@ -98,7 +98,7 @@ describe('Markdown Converter', function () {
       expect(pagedata).to.have.property('template');
       expect(pagedata).to.have.deep.property('data.articles');
       expect(pagedata).to.have.deep.property('data.tags');
-      expect(pagedata).to.have.deep.property('data.archives');
+      expect(pagedata).to.have.deep.property('data.categories');
       expect(pagedata).to.have.deep.property('data.authors');
 
       expect(pagedata.output).to.equal(path.join(options.output, output));
@@ -106,10 +106,10 @@ describe('Markdown Converter', function () {
 
       expect(pagedata.data.articles).to.be.an('array');
       expect(pagedata.data.tags).to.be.an('object');
-      expect(pagedata.data.archives).to.be.an('object');
+      expect(pagedata.data.categories).to.be.an('object');
       expect(pagedata.data.authors).to.be.an('object');
 
-      expect(pagedata.data.archives).to.have.property('category');
+      expect(pagedata.data.categories).to.have.property('category');
       expect(pagedata.data.tags).to.contain.all.keys(['tag1', 'tag2']);
       expect(pagedata.data.authors).to.have.property('david');
     });

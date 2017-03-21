@@ -1,7 +1,6 @@
 /* eslint max-nested-callbacks: off */
 /* eslint-env mocha */
 
-import _          from 'lodash';
 import fs         from 'fs-extra';
 import path       from 'path';
 import { expect } from 'chai';

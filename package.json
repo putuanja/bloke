@@ -1,6 +1,6 @@
 {
   "name": "bloke",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "description": "Blog generator",
   "homepage": "https://github.com/DavidKk/bloke",
@@ -13,7 +13,7 @@
     "node": ">= 7.6.0"
   },
   "scripts": {
-    "eslint": "eslint ./src",
+    "eslint": "eslint ./src && eslint ./unitest",
     "mocha": "mocha --require babel-polyfill --compilers js:babel-register ./unitest/**/*.spec.js",
     "test": "npm run eslint && npm run mocha",
     "coverage": "rimraf ./coverage && nyc --reporter=text --reporter=lcov --report-dir=./coverage/cli npm run test && rimraf ./.temporary",

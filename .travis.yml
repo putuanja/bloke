@@ -1,27 +1,22 @@
 language: node_js
 sudo: false
 node_js:
-  - 7.6.0
-
+- 6
+- 7
 cache:
   directories:
-    - node_modules
-
+  - node_modules
 install:
-  - npm install
-  - npm install bloke-theme-sharp
-  - npm install coveralls
-
+- npm install
+- npm install bloke-theme-sharp
+- npm install coveralls
 before_script:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
 script:
-  - npm run coveralls
-
+- npm run coveralls
 before_deploy:
-  - npm run release
-
+- npm run release
 deploy:
   provider: npm
   skip_cleanup: true
@@ -29,4 +24,4 @@ deploy:
     tags: true
   email: qowera@qq.com
   api_key:
-    secure: EWrUoaRR6hQsRNFxQdqSbu9U1J9mF4u2y8oYs36aFLl6/Z6nn3X4tvmkRtw/jF1fNDJFsEwA7qx7tBMQvxXxg53XC2ljxIQxlwR5Wra7/ppIvLMoyGj0OoboA/YJWM2JOLjpAEZPsSOSoopZut8q8jm7CTybiQ5pSWKPZSC0mwJBCvsU6UUTAsjYc06lq8qAKgy+yV5XrVwyVBm85FKjcqbAGgn1cM1WAtgfSkvTuBUTlXtVpIU6rqR4x/0CPtAQzL7JTz7jPTTgkKtMHuXy+wtLt57rHXutvI8fgUDtPoHANRbVA1azAAqOOosPcWaOtE6+jbSkOonsDJExS+ZmXWNvhE/11U1L6NfygIMnc6KL8rZ7mJ8FtBPbQASxtn4nDV11t6w2JoQBgxr9wwlvEFw/IO6YfXzrDNdXCnupJ9WPVTHUNoiQUxu7giZhfxmJNBgBBSYuBAnrLvdp/ZLOsYq+2sg13ESDCzuOQuwjDbtj8NAnfjuQ4LwunkahxIAH23BvQ6aYv/znq36RlxgokcUo79WGfNNd1oJumbSUDWi+8MpEEmnjQTlRI/JYFHOG2F9B54ll3wMVKGzvWks6CFKk/OC//wo2i2SMsw1fQ/6QoBxbYhocNhAj8yJs5ZU9WPQ4daUgIv9LUy1dKpPpTCr6WAf6HOBi4ZAJt7P3zk0=
+    secure: Gtv4tNnH//BRTvAKKq+FQ3p2VSdtO1P+4GY1ekwesliXYsuicAR5YlBQ50ywMHNpeb5jhYTc2eXQpAtFQGnmmr8Fbf0GDKBS1+d43l1b8XFhSabRuXzGfr44NExdg9UeYRlLX4DPUwdXLBh4emT4b3VZv5++Fh/GjOS/4jJW3sn4WGqkik06yO3lppyBE6M/6wah7dzSaNgPwePxmhteaIjn49glNDmmTAPg1cm+YU6b2CuQEYdlEoH6eE/sv2PSeCTwCyKwj/Hg2H1gG0tfcm9tWAlfP18/41O/rs2M763usQjLEMXYWc8SMSPNzkSl0x2kz13Dn0cxpmYUWL70F8VmM9nkXvF9XZeiMPxnMeLjRN5gMXORjk4c+RkmRZ9KzUZ6bMgum9LtYkuVdc9eniCsqmUBazJkOidPv9EjLJ6mc9aTUJe21qVC+F2SgCp6izzXdt+6nkhfJks7+opzKYNN0Ha2N3a8honzYdVPsL1ybzIib3WwAcd5dg0N5m+EFFIdm0nPNBHhuKscBjcr1wMx7hcGP84ziI4glItLeZ+TQ4PxlJSO6NgTiAVR+9L9ep1IZc6eb8/8VLW4udTAIjkkdvoic47Bu+CFwvXPfIhBeUJCnef0aAsbSMz3WV1JO1/ybYbs9hJn/N8jjh/Sv8CDrAyTYMYSraxyhPM3EBc=

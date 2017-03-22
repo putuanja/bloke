@@ -32,13 +32,10 @@
     "babel-preset-stage-0": "^6.22.0",
     "babel-register": "^6.23.0",
     "chai": "^3.5.0",
-    "dateformat": "^2.0.0",
     "eslint": "^3.17.0",
     "local-web-server": "^1.2.6",
     "mocha": "^3.2.0",
     "nyc": "^10.1.2",
-    "object.observe": "^0.2.6",
-    "observed": "^1.1.2",
     "sinon": "^1.17.7"
   },
   "dependencies": {
@@ -55,6 +52,7 @@
     "rimraf": "^2.6.1",
     "trim-html": "^0.1.7",
     "xmlbuilder": "^8.2.2",
-    "handlebars": "^4.0.6"
+    "handlebars": "^4.0.6",
+    "dateformat": "^2.0.0"
   }
 }

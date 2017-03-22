@@ -1,11 +1,6 @@
-.git
-.hg
-.svn
-.gitignore
-
-
-# NPM
-.npmrc
+# Main folders
+/src
+/unitest
 
 
 # Temporary folders
@@ -18,16 +13,24 @@
 
 
 # Dependency folders
+yarn.lock
 node_modules
 npm-debug.log
+yarn-debug.log
 
 
-# NPM
-npm-shrinkwrap.json
-
-
-# YARN
-yarn.lock
+# Vendors
+.babelrc
+.eslintrc
+.stylelintrc
+.stylelintrc
+.travis.yml
+.git
+.hg
+.svn
+.gitignore
+.npmrc
+.yarnrc
 
 
 # Numerous always-ignore extensions

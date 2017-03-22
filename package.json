@@ -34,7 +34,6 @@
     "chai": "^3.5.0",
     "dateformat": "^2.0.0",
     "eslint": "^3.17.0",
-    "handlebars": "^4.0.6",
     "local-web-server": "^1.2.6",
     "mocha": "^3.2.0",
     "nyc": "^10.1.2",
@@ -55,6 +54,7 @@
     "pug": "^2.0.0-beta11",
     "rimraf": "^2.6.1",
     "trim-html": "^0.1.7",
-    "xmlbuilder": "^8.2.2"
+    "xmlbuilder": "^8.2.2",
+    "handlebars": "^4.0.6"
   }
 }

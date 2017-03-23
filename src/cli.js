@@ -25,7 +25,6 @@ program
 .option('--server', 'open dev server')
 .option('--server-port', 'set server port')
 .option('--watch', 'listen file changed')
-.option('--deploy', 'use Travis CI to deploy to github')
 .action(compileAction);
 
 program
@@ -42,12 +41,6 @@ function compileAction (folder = VARS.ROOT_PATH, params) {
     output : path.join(pwd, './blog'),
     ignore : [/node_modules/],
     theme  : VARS.DEFAULT_THEME,
-    deploy : {
-      source  : './blog',
-      release : './.launch',
-      apikey  : '',
-      email   : '',
-    },
   }, pwd);
 
   let themeSetting = loadThemeRC(blokeSetting.theme.use, {
@@ -148,14 +141,11 @@ function compileAction (folder = VARS.ROOT_PATH, params) {
     }
   });
 
-  if (params.deploy && !params.server && !params.watch) {
-    let template = path.join(VARS.EXECUTE_PATH, './template/deploy.sh');
-    let output   = path.join(VARS.ROOT_PATH, './deploy.sh');
-    let source   = fs.readFileSync(template);
-    let render   = handlebars.compile(source.toString());
-    let content  = render(blokeSetting.deploy);
+  if (blokeSetting.domain) {
+    fs.ensureDirSync(blokeSetting.output);
 
-    fs.writeFileSync(output, content);
+    let cname = path.join(blokeSetting.output, './CNAME');
+    fs.writeFileSync(cname, blokeSetting.domain);
   }
 }
 
@@ -169,10 +159,6 @@ function loadRC (file, defaultSetting, folder = VARS.ROOT_PATH) {
 
   if (options.output) {
     options.output = utils.resolvePath(options.output, folder);
-  }
-
-  if (!options.deploy.root) {
-    options.deploy.root = options.output.replace(options.root, '');
   }
 
   return options;

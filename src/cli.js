@@ -149,7 +149,7 @@ function compileAction (folder = VARS.ROOT_PATH, params) {
   });
 
   if (params.deploy && !params.server && !params.watch) {
-    let template = path.join(__dirname, './template/deploy.sh');
+    let template = path.join(VARS.EXECUTE_PATH, './template/deploy.sh');
     let output   = path.join(VARS.ROOT_PATH, './deploy.sh');
     let source   = fs.readFileSync(template);
     let render   = handlebars.compile(source.toString());
